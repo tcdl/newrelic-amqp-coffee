@@ -2,15 +2,15 @@ module.exports = function instrumentAmqpCoffee(shim, AMQP, moduleName) {
   shim.setLibrary(shim.RABBITMQ);
 
   shim.recordProduce(AMQP.prototype, 'publish', (shim, fn, name, args) => {
-    const queueName = args[0];
+    const exchangeName = args[0];
     if (!args[3].headers) {
       args[3].headers = {};
     }
     const headers = args[3].headers;
     return {
       callback: shim.LAST,
-      destinationName: queueName,
-      destinationType: shim.QUEUE,
+      destinationName: exchangeName,
+      destinationType: shim.EXCHANGE,
       headers: headers,
       parameters: {}
     };
