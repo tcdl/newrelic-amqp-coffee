@@ -50,10 +50,9 @@ describe('newrelic-amqp-coffee', () => {
         connection.consume(queueName, {}, envelope => {
           const tx = helper.getTransaction();
           assert.isDefined(tx);
-          const segments = tx.trace.root.getChildren();
-          assert.lengthOf(segments, 1);
-          assert.equal(segments[0].name, `OtherTransaction/Message/RabbitMQ/Queue/Named/${queueName}`);
-          // assert.isNotEmpty(envelope.properties.headers);
+          assert.equal(tx.getFullName(), `OtherTransaction/Message/RabbitMQ/Queue/Named/${queueName}`);
+          assert.isNotEmpty(envelope.properties.headers);
+          assert.property(envelope.properties.headers, 'NewRelicTransaction');
           done();
         }, () => {});
         helper.runInTransaction('background', tx => {
@@ -61,7 +60,6 @@ describe('newrelic-amqp-coffee', () => {
             tx.end();
           });
         });
-
       });
     });
   });
