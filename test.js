@@ -11,7 +11,7 @@ describe('newrelic-amqp-coffee', () => {
     helper.registerInstrumentation({
       moduleName: 'amqp-coffee',
       type: 'message',
-      onRequire: require('./instrumentation')
+      onRequire: require('./lib/instrumentation')
     });
     const AMQP = require('amqp-coffee');
     connection = new AMQP({host: 'localhost'}, () => {
