@@ -35,6 +35,7 @@ describe('newrelic-amqp-coffee', () => {
       assert.equal(segments[0].name, `MessageBroker/RabbitMQ/Exchange/Produce/Named/${exchangeName}`);
       done();
     });
+
     helper.runInTransaction('background', tx => {
       connection.publish(exchangeName, '', 'hello', () => {
         tx.end();
@@ -63,12 +64,11 @@ describe('newrelic-amqp-coffee', () => {
         assert.property(envelope.properties.headers, 'NewRelicTransaction');
         envelope.ack();
         helper.agent.on('transactionFinished', () => done());
-      }, () => {
       });
+
       helper.runInTransaction('background', tx => {
-        connection.publish(exchangeName, '', 'hello', {}, () => {
-          tx.end();
-        });
+        connection.publish(exchangeName, '', 'hello');
+        tx.end();
       });
     });
 
@@ -81,13 +81,12 @@ describe('newrelic-amqp-coffee', () => {
         assert.hasAllKeys(envelope.properties.headers, ['NewRelicID', 'NewRelicTransaction']);
         envelope.ack();
         done();
-      }, () => {
       });
+
       helper.runInTransaction('background', tx => {
         tripId = tx.tripId || tx.id;
-        connection.publish(exchangeName, '', 'hello', {}, () => {
-          tx.end();
-        });
+        connection.publish(exchangeName, '', 'hello', {});
+        tx.end();
       });
     });
 
@@ -98,12 +97,11 @@ describe('newrelic-amqp-coffee', () => {
           envelope.ack();
           helper.agent.on('transactionFinished', () => done());
         }, 10);
-      }, () => {
-      });
+      }, () => {});
+
       helper.runInTransaction('background', tx => {
-        connection.publish(exchangeName, '', 'hello', {}, () => {
-          tx.end();
-        });
+        connection.publish(exchangeName, '', 'hello');
+        tx.end();
       });
     });
   });

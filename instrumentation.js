@@ -1,10 +1,12 @@
 
-module.exports = function instrumentAmqpCoffee(shim, AMQP, moduleName) {
+module.exports = function instrumentAmqpCoffee(shim, AMQP) {
   shim.setLibrary(shim.RABBITMQ);
 
   shim.recordProduce(AMQP.prototype, 'publish', (shim, fn, name, args) => {
-    console.log('record produce');
     const exchangeName = args[0];
+    if (typeof(args[3]) !== 'object') {
+      args.splice(3, 0, {});
+    }
     if (!args[3].headers) {
       args[3].headers = {};
     }
@@ -18,30 +20,28 @@ module.exports = function instrumentAmqpCoffee(shim, AMQP, moduleName) {
     };
   });
 
-  const messageHandler = (shim, fn, name, args) => {
-    console.log('record consume');
-    const tx = shim.tracer.getTransaction();
-    tx.handledExternally = true;
-    const msg = args[0];
-    shim.wrap(msg, 'ack', function wrapAck(shim, fn) {
-      return function wrappedAck() {
-        console.log('wrapped ack called');
-        tx.end();
-        return fn.apply(this, arguments);
-      }
-    });
-    const headers = msg.properties.headers;
-    return {
-      headers: headers,
-      parameters: {}
-    };
-  };
-
   shim.recordSubscribedConsume(AMQP.prototype, 'consume', {
     destinationName: shim.FIRST,
     destinationType: shim.QUEUE,
     queue: shim.FIRST,
-    consumer: shim.LAST - 1,
+    consumer: shim.THIRD,
     messageHandler
   });
+};
+
+const messageHandler = (shim, fn, name, args) => {
+  const tx = shim.tracer.getTransaction();
+  tx.handledExternally = true;
+  const msg = args[0];
+  shim.wrap(msg, 'ack', function wrapAck(shim, fn) {
+    return function wrappedAck() {
+      tx.end();
+      return fn.apply(this, arguments);
+    }
+  });
+  const headers = msg.properties.headers;
+  return {
+    headers: headers,
+    parameters: {}
+  };
 };
