@@ -20,12 +20,13 @@ module.exports = function instrumentAmqpCoffee(shim, AMQP, moduleName) {
 
   const messageHandler = (shim, fn, name, args) => {
     console.log('record consume');
-    // const tx = newrelic.getTransaction();
+    const tx = shim.tracer.getTransaction();
+    tx.handledExternally = true;
     const msg = args[0];
     shim.wrap(msg, 'ack', function wrapAck(shim, fn) {
       return function wrappedAck() {
         console.log('wrapped ack called');
-        // tx.end();
+        tx.end();
         return fn.apply(this, arguments);
       }
     });

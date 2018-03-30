@@ -42,23 +42,67 @@ describe('newrelic-amqp-coffee', () => {
     });
   });
 
-  it('should record consume segment', done => {
-    let queueName = exchangeName + ':q';
-    const queue = connection.queue({queue: queueName, durable: false, autoDelete: true});
-    queue.declare(() => {
-      queue.bind(exchangeName, '', () => {
-        connection.consume(queueName, {}, envelope => {
-          const tx = helper.getTransaction();
-          assert.isDefined(tx);
-          assert.equal(tx.getFullName(), `OtherTransaction/Message/RabbitMQ/Queue/Named/${queueName}`);
-          assert.isNotEmpty(envelope.properties.headers);
-          assert.property(envelope.properties.headers, 'NewRelicTransaction');
+  describe('consume', () => {
+    const queueName = exchangeName + ':q';
+
+    beforeEach(done => {
+      const queue = connection.queue({queue: queueName, durable: false});
+      queue.declare(() => {
+        queue.bind(exchangeName, '', () => {
           done();
-        }, () => {});
-        helper.runInTransaction('background', tx => {
-          connection.publish(exchangeName, '', 'hello', {}, () => {
-            tx.end();
-          });
+        });
+      });
+    });
+
+    it('should record consume transaction', done => {
+      connection.consume(queueName, {prefetchCount: 1}, envelope => {
+        const tx = helper.getTransaction();
+        assert.isNotNull(tx);
+        assert.equal(tx.getFullName(), `OtherTransaction/Message/RabbitMQ/Queue/Named/${queueName}`);
+        assert.isNotEmpty(envelope.properties.headers);
+        assert.property(envelope.properties.headers, 'NewRelicTransaction');
+        envelope.ack();
+        helper.agent.on('transactionFinished', () => done());
+      }, () => {
+      });
+      helper.runInTransaction('background', tx => {
+        connection.publish(exchangeName, '', 'hello', {}, () => {
+          tx.end();
+        });
+      });
+    });
+
+    it('should apply cross application tracing', done => {
+      let tripId;
+      connection.consume(queueName, {prefetchCount: 1}, envelope => {
+        const tx = helper.getTransaction();
+        assert.isDefined(tx.tripId);
+        assert.equal(tx.tripId, tripId);
+        assert.hasAllKeys(envelope.properties.headers, ['NewRelicID', 'NewRelicTransaction']);
+        envelope.ack();
+        done();
+      }, () => {
+      });
+      helper.runInTransaction('background', tx => {
+        tripId = tx.tripId || tx.id;
+        connection.publish(exchangeName, '', 'hello', {}, () => {
+          tx.end();
+        });
+      });
+    });
+
+    it('should finish transaction when the message is acknowledged', done => {
+      connection.consume(queueName, {prefetchCount: 1}, envelope => {
+        setTimeout(() => {
+          assert.isNotNull(helper.getTransaction());
+          envelope.ack();
+          helper.agent.on('transactionFinished', () => done());
+        }, 10);
+      }, () => {
+      });
+      helper.runInTransaction('background', tx => {
+        connection.publish(exchangeName, '', 'hello', {}, () => {
+          tx.end();
         });
       });
     });
