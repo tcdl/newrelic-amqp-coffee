@@ -1,14 +1,14 @@
 language: node_js
 node_js:
-  - '6'
-  - '8'
+- '6'
+- '8'
 services:
-  - rabbitmq
+- rabbitmq
 deploy:
   provider: npm
   email: integration-dev@thomascookonline.com
   api_key:
-    secure: QeNaYZ2a8+rBAqzOdF7vY2btaCECa8/r+gCxCVfYa+r/Kr5S25MQeTrdGOf6/3a4S4GZMp/0okiLAyrZqdOdU33QEi6vkfWK7ntskiMM/wH6CCSHpxu9raOR0U2TobsTiWf5B0UThrxVNQwwsuVbUcqVJApF44SHOpd11JUGne2juaEcWZ7CVHQ2Q3HfX4Kz/OMjRZOZ5WeeH6n/NdsFhCjTVbO0ygi7cnG6dSyvYlOlfgp6WlpWpJH9bQ6aalV3Yv8INY2DJiLugaWfS+aM+B8n3UkmvotnyveBeGgACoAUEKzmhfSzWn6ab2COMzHBkzPLMe83p2iB6/+QnsG7mH31cu/f9b+RxRYLvVap93DvSKNycGiFO5MAqfGYzOXyP1aWBhlA1kVnAPRVbWRs69PtWYWM2BebZpwL9vtYorLUp5Cu+q+Pxc//4BpKgMVY7usx6g9r4AbWuWAj5AwZWbWyIqO3Hvntrabm+SpgRFmbXy3xY0V7LvaaZha71WL3LivLY0k54dWmBdZyqAnMLmscTaB4FLzE3IwRlFCjsVUk4Phpg8/2nnD3qy0nwgzlatkO8vgIEw+seYjum2UlEuitFeYSkBJvBoVyCP97CFc73dcN2fXF9PhDkts4beJVZaQTSggll7faEcaHxu3NEvasob3dvH8Ia+speAEjEso=
+    secure: S24fr9QrQRd+4pZcfZ9O6IUbIqKMDXnlvgXUc/C8JYjrIQevT+706oUnFe9ApDaGLNoWMy6l/Cny1lAokKVzWnHGRnHRbBUzB7oDJkv+TjWkexd/jcfV2q7YUtCiZk3LJsr83f8v6nZo0beQ1Pr7DKZgE38JX3o16jO7WNOmDmt/lJVCBLtOHC/gX0Eys+tDyrhibnLb/2XtKm/Mi0YsB71iSHY0OrDL0JQTrL6z0tsO2AXOJbYFgRnakwZamuHFIvo5oO/Tp4CCA66JuFQzEw2st+Qhqng3OUdO54rlVVxKZKyMB0LHGljuZry5UHPSANAmmKkZMnPVNfje5ev9S/KzzxHp4sCTu8wq19VUz/RqCdsurcLlN6grE0E+d0eIeBQ2jvbMyMB5tb/5A15Wy079Hs/+dUcL3aCHxW3w1baaerZPR327kyYqQDxDWYrlUQ+veJshTsjzolMFjquWvxEyLLbTiHnY0+QvdRnOMEqg6BHH7T2tTY5TnRsCnnOWsil+L4/vTF3Gz0tiSfgGrOEIf6v+6WuZXoQLjspTFcTIUenmwduh14C1gr+oh1YeU8e5a0DHewwwdvwXzPwtA4sqmd+GsDEI0lJQ1ar3rkb+JnxBh+Va+b/5JmO64dePSAs636R94M2tM6BxLgvR2Kv6hj1afy7gU1+yV3LLfNg=
   on:
     tags: true
     repo: tcdl/newrelic-amqp-coffee
