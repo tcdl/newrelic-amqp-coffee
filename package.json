@@ -8,6 +8,8 @@
   },
   "author": "",
   "license": "MIT",
+  "dependencies": {
+  },
   "peerDependencies": {
     "newrelic": "^3.3.0"
   },
