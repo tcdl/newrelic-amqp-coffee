@@ -1,0 +1,21 @@
+{
+  "name": "newrelic-amqp-coffee",
+  "version": "0.0.1",
+  "description": "A NewRelic instrumentation for amqp-coffee",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "newrelic": "^3.3.0"
+  },
+  "devDependencies": {
+    "@newrelic/test-utilities": "^1.2.0",
+    "amqp-coffee": "^0.1.31",
+    "chai": "^4.1.2",
+    "mocha": "^5.0.5",
+    "newrelic": "^3.3.0"
+  }
+}
