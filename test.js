@@ -95,7 +95,28 @@ describe('newrelic-amqp-coffee', () => {
         setTimeout(() => {
           assert.isNotNull(helper.getTransaction());
           envelope.ack();
-          helper.agent.on('transactionFinished', () => done());
+          helper.agent.on('transactionFinished', () => {
+            assert.equal(helper.agent.errors.errorCount, 0);
+            done();
+          });
+        }, 10);
+      }, () => {});
+
+      helper.runInTransaction('background', tx => {
+        connection.publish(exchangeName, '', 'hello');
+        tx.end();
+      });
+    });
+
+    it('should finish transaction when the message is rejected', done => {
+      connection.consume(queueName, {prefetchCount: 1}, envelope => {
+        setTimeout(() => {
+          assert.isNotNull(helper.getTransaction());
+          envelope.reject();
+          helper.agent.on('transactionFinished', () => {
+            assert.equal(helper.agent.errors.errorCount, 1);
+            done();
+          });
         }, 10);
       }, () => {});
 
